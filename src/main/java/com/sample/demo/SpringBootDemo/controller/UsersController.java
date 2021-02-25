@@ -3,21 +3,24 @@ package com.sample.demo.SpringBootDemo.controller;
 import com.sample.demo.SpringBootDemo.entity.Users;
 import com.sample.demo.SpringBootDemo.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@Controller
 public class UsersController {
 
     @Autowired
     UsersService usersService;
 
-//    @RequestMapping("/")
-//    public String index() {
-//        return "index.html";
-//    }
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @GetMapping("/login")
+    public String index() {
+        return "login.html";
+    }
 
     @GetMapping("/")
     private List<Users> getAllUsers()
@@ -27,18 +30,17 @@ public class UsersController {
 
     @PostMapping("/add")
     @ResponseBody
-    public String addUser(@RequestParam String userName, @RequestParam String password, @RequestParam String email) {
+    public void addUser(@RequestParam String userName, @RequestParam String password) {
 
         Users user = new Users();
         user.setUsername(userName);
-        user.setPassword(password);
+        String encodedPassword = bCryptPasswordEncoder.encode(password);
+        user.setPassword(encodedPassword);
 
         usersService.saveOrUpdate(user);
 
-        String ret = "User has been added, user name = " + userName + ", password = " + password + ", email = "
-                + email;
+        System.out.println("User has been added, user name = " + user.getUsername() + ", password = " + encodedPassword);
 
-        return ret;
 
     }
 
